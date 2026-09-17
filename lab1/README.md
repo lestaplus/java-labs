@@ -12,8 +12,13 @@
 git clone https://github.com/lestaplus/java-labs.git
 ```
 
-2. Скомпілюйте та запустіть із кореня проєкту
+2. Перейдіть до теки лабораторної роботи
 ```bash
-javac lab1/*.java
-java lab1.Main
+cd java-labs/lab1/src
+```
+
+3. Скомпілюйте та запустіть програму
+```bash
+javac Main.java StringAnalyzer.java
+java Main
 ```
