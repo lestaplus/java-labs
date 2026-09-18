@@ -31,10 +31,18 @@ javac -cp "lib/*" -d out src/*.java
 
 4. Запустіть головну програму
 ```bash
+# Windows
 java -cp "out;lib/gson-2.14.0.jar" Main
+
+# Linux / MacOS
+java -cp "out:lib/gson-2.14.0.jar" Main
 ```
 
 5. Запустіть unit-тести через консольний runner
 ```bash
+# Windows
 java -jar lib/junit-platform-console-standalone-6.1.3.jar execute -cp "out;lib/equalsverifier-nodep-4.5.2.jar;lib/gson-2.14.0.jar" --select-class PersonTest
+
+# Linux / MacOS
+java -jar lib/junit-platform-console-standalone-6.1.3.jar execute -cp "out:lib/equalsverifier-nodep-4.5.2.jar:lib/gson-2.14.0.jar" --select-class PersonTest
 ```
