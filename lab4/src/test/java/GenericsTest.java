@@ -53,7 +53,7 @@ class GenericsTest {
         bus.addPassenger(policeman);
         bus.addPassenger(fireman);
 
-        List<? extends Person> passengers = bus.getPassengers();
+        List<Person> passengers = bus.getPassengers();
 
         assertEquals(person, bus.getDriver());
         assertEquals(2, bus.getPassengers().size());
