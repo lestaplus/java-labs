@@ -1,6 +1,5 @@
 package road;
 
-import model.person.Person;
 import model.vehicle.Vehicle;
 
 import java.util.ArrayList;

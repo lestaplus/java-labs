@@ -76,7 +76,7 @@ public abstract class Vehicle<T extends Person> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Vehicle vehicle = (Vehicle) o;
+        Vehicle<?> vehicle = (Vehicle<?>) o;
         return capacity == vehicle.capacity &&
                 Objects.equals(model, vehicle.model) &&
                 Objects.equals(driver, vehicle.driver) &&
