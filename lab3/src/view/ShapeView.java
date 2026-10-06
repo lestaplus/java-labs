@@ -10,7 +10,7 @@ public class ShapeView {
     public void printShapes(Shape[] shapes) {
         for (Shape shape : shapes) {
             shape.draw();
-            System.out.println(shape.toString() + ", area: " + shape.calcArea());
+            System.out.println(shape + ", area: " + shape.calcArea());
         }
     }
 }
