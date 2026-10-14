@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-public class ListAnalyzer {
+public class StringAnalyzer {
     public static double calcAvgStrLength(String[] words) {
         if (words == null || words.length == 0) return 0.0;
 

@@ -72,7 +72,7 @@ public class Menu {
                 }
 
                 String[] wordsArray = words.toArray(String[]::new);
-                String[] shorterWordsArr = ListAnalyzer.stringsDiffFromAvg(wordsArray, false);
+                String[] shorterWordsArr = StringAnalyzer.stringsDiffFromAvg(wordsArray, false);
 
                 printAvgInfo(wordsArray);
 
@@ -86,7 +86,7 @@ public class Menu {
                 }
 
                 String[] wordsArray = words.toArray(String[]::new);
-                String[] longerWordsArr = ListAnalyzer.stringsDiffFromAvg(wordsArray, true);
+                String[] longerWordsArr = StringAnalyzer.stringsDiffFromAvg(wordsArray, true);
 
                 printAvgInfo(wordsArray);
 
@@ -117,7 +117,7 @@ public class Menu {
     }
 
     private void printAvgInfo(String[] words) {
-        double avg = ListAnalyzer.calcAvgStrLength(words);
+        double avg = StringAnalyzer.calcAvgStrLength(words);
         System.out.println("\nAverage word length: " + String.format("%.2f", avg));
     }
 }
