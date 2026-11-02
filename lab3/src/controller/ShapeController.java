@@ -5,12 +5,20 @@ import service.ShapeFileHandler;
 import view.ShapeView;
 
 import java.io.File;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ShapeController {
+    private static final Logger logger = Logger.getLogger(ShapeController.class.getName());
+
+    private ResourceBundle bundle = ResourceBundle.getBundle("location.text", Locale.ENGLISH);
+
     private final ShapeModel model;
     private final ShapeView view;
-    private final Scanner sc =  new Scanner(System.in);
+    private final Scanner sc = new Scanner(System.in);
 
     private final Shape[] defaultShapes = {
             new Rectangle("Red", 0.0, 0.5, 4.0, 5.0),
@@ -33,46 +41,74 @@ public class ShapeController {
     public void processUser() {
         int menuItem;
         while (true) {
-            view.printMessage("""
-                --- Menu ---
-                1 - Load shapes from file
-                2 - Export shapes to file
-                3 - Print shapes information
-                0 - Exit
-                Enter menu item number (0..3):\s""");
+            view.printMessage(
+                    bundle.getString("menu.header") + "\n" +
+                            bundle.getString("menu.load") + "\n" +
+                            bundle.getString("menu.export") + "\n" +
+                            bundle.getString("menu.print") + "\n" +
+                            bundle.getString("menu.lang") + "\n" +
+                            bundle.getString("menu.exit") + "\n" +
+                            bundle.getString("menu.prompt")
+            );
 
             String item = sc.nextLine();
             if (item.trim().isEmpty()) {
-                view.printMessage("Invalid input.");
+                logger.warning("The user entered an empty string");
+                view.printMessage(bundle.getString("msg.invalid"));
                 continue;
             }
 
             try {
                 menuItem = Integer.parseInt(item);
-                if (menuItem < 0 || menuItem > 3) {
-                    view.printMessage("Invalid input.");
+                if (menuItem < 0 || menuItem > 4) {
+                    logger.warning("The user selected an unknown option");
+                    view.printMessage(bundle.getString("msg.invalid"));
                     continue;
                 }
 
                 if (menuItem == 0) {
-                    view.printMessage("Exiting...");
+                    logger.info("The user chose to exit the application.");
+                    view.printMessage(bundle.getString("msg.exiting"));
                     return;
                 }
 
-                menuSelection(menuItem);
+                if (menuItem == 4) {
+                    changeLanguage();
+                } else {
+                    logger.fine("Selected menu item: " + menuItem);
+                    menuSelection(menuItem);
+                }
             } catch (NumberFormatException e) {
-                view.printMessage("Invalid input.");
+                logger.log(Level.WARNING, "Number format exception: non-numeric input", e);
+                view.printMessage(bundle.getString("msg.invalid"));
             }
         }
     }
 
+    private void changeLanguage() {
+        view.printMessage(bundle.getString("msg.lang_prompt"));
+        String choice = sc.nextLine().trim();
+
+        if (choice.equals("1")) {
+            bundle = ResourceBundle.getBundle("location.text", Locale.ENGLISH);
+            view.printMessage(bundle.getString("msg.lang_changed"));
+            logger.info("Language changed to English");
+        } else if (choice.equals("2")) {
+            bundle = ResourceBundle.getBundle("location.text", Locale.of("uk", "UA"));
+            view.printMessage(bundle.getString("msg.lang_changed"));
+            logger.info("Language changed to Ukrainian");
+        } else {
+            view.printMessage(bundle.getString("msg.invalid"));
+        }
+    }
+
     public void showInfo() {
-        view.printMessage("Current shapes set:");
+        view.printMessage(bundle.getString("view.curr_shapes"));
         view.printShapes(model.getShapes());
 
-        view.printMessage("\nArea of all shapes: " + model.calcAreaAll());
+        view.printMessage("\n" + bundle.getString("view.area_shapes") + " " + model.calcAreaAll());
 
-        view.printMessage("\nEnter shape type to calculate total area: ");
+        view.printMessage("\n" + bundle.getString("view.type_for_area"));
 
         String shapeType;
         while (true) {
@@ -80,14 +116,14 @@ public class ShapeController {
             if (shapeType.equalsIgnoreCase("Rectangle") ||
                     shapeType.equalsIgnoreCase("Circle") ||
                     shapeType.equalsIgnoreCase("Triangle")) break;
-            view.printMessage("Invalid shape type.");
+            view.printMessage(bundle.getString("view.invalid_shape"));
         }
-        view.printMessage("\nArea of all " + shapeType + "s: " + model.calcAreaByType(shapeType));
+        view.printMessage("\n" + bundle.getString("view.type_area") + " " + model.calcAreaByType(shapeType));
 
-        view.printMessage("\nSorted shapes by area:");
+        view.printMessage("\n" + bundle.getString("view.sorted_by_area"));
         view.printShapes(model.sortShapesByArea());
 
-        view.printMessage("\nSorted shapes by color:");
+        view.printMessage("\n" + bundle.getString("view.sorted_by_color"));
         view.printShapes(model.sortShapesByColor());
     }
 
@@ -96,7 +132,7 @@ public class ShapeController {
             String filePath = null;
             if (item == 1 || item == 2) {
                 while (!isPathValid(filePath)) {
-                    view.printMessage("Enter valid relative path: ");
+                    view.printMessage(bundle.getString("view.valid_path"));
                     filePath = sc.nextLine();
                 }
             }
@@ -106,28 +142,34 @@ public class ShapeController {
                     Shape[] loadedShapes = ShapeFileHandler.readFile(filePath);
                     if (loadedShapes != null) {
                         model.setShapes(loadedShapes);
-                        view.printMessage("Shapes loaded.");
+                        logger.info("Loaded " + loadedShapes.length + " shapes");
+                        view.printMessage(bundle.getString("view.shapes_loaded"));
                     }
                     break;
                 case 2:
                     Shape[] shapesToExport = model.getShapes();
                     if (shapesToExport == null) {
-                        view.printMessage("Model is empty. Exporting default initial shapes...");
+                        logger.warning("Model is empty");
+                        view.printMessage(bundle.getString("view.empty_model"));
                         shapesToExport = defaultShapes;
                     }
                     ShapeFileHandler.writeFile(filePath, shapesToExport);
-                    view.printMessage("Shapes exported.");
+                    logger.info("Exported " + shapesToExport.length + " shapes");
+                    view.printMessage(bundle.getString("view.shapes_exported"));
                     break;
                 case 3:
                     if (model.getShapes() == null) {
-                        view.printMessage("First, load shapes from file.");
+                        logger.warning("Model is empty");
+                        view.printMessage(bundle.getString("view.load_needed"));
                         break;
                     }
+                    logger.info("Loading " + model.getShapes().length + " shapes");
                     showInfo();
                     break;
             }
         } catch (Exception e) {
-            view.printMessage("Error processing menu: " + e.getMessage());
+            logger.log(Level.SEVERE, "Error processing menu", e);
+            view.printMessage(bundle.getString("menu.error") + " " + e.getMessage());
         }
     }
 
@@ -141,6 +183,7 @@ public class ShapeController {
             file.getCanonicalPath();
             return true;
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Invalid file path", e);
             System.out.println("Invalid file path!");
             return false;
         }
