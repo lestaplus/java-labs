@@ -57,3 +57,5 @@ bin/
 .DS_Store
 
 target/
+
+**/src/main/resources/db.properties
